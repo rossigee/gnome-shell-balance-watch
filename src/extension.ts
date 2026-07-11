@@ -60,7 +60,12 @@ class BalanceIndicatorView extends PanelMenu.Button {
 
   actor!: Clutter.Actor;
 
-  constructor(private ext: ExtensionBase, accountId: string, options: AccountOptions, apiKey: string) {
+  constructor(
+    private ext: ExtensionBase,
+    accountId: string,
+    options: AccountOptions,
+    apiKey: string,
+  ) {
     super(1.0, 'Balance Watch Indicator', false);
     this.accountId = accountId;
     this._apiKey = apiKey;
@@ -149,7 +154,9 @@ class BalanceIndicatorView extends PanelMenu.Button {
       this._handleRetry();
     });
 
-    (this.menu as unknown as PopupMenu.PopupMenu).addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+    (this.menu as unknown as PopupMenu.PopupMenu).addMenuItem(
+      new PopupMenu.PopupSeparatorMenuItem(),
+    );
 
     this._popupItemSettings = new PopupMenu.PopupMenuItem('Settings');
     (this.menu as unknown as PopupMenu.PopupMenu).addMenuItem(this._popupItemSettings);
@@ -179,7 +186,9 @@ class BalanceIndicatorView extends PanelMenu.Button {
 
   onClearValue() {
     this._showLoading();
-    this._displayText(Format.format(undefined, this.providerLabel, this.options?.format || '{provider} ...'));
+    this._displayText(
+      Format.format(undefined, this.providerLabel, this.options?.format || '{provider} ...'),
+    );
   }
 
   onUpdateBalance(data: BalanceData) {
@@ -201,7 +210,9 @@ class BalanceIndicatorView extends PanelMenu.Button {
       return;
     }
     const tooltipText = !error ? '' : error instanceof Error ? error.message : String(error);
-    (this.actor as Clutter.Actor & { set_tooltip_text: (text: string) => void }).set_tooltip_text(tooltipText);
+    (this.actor as Clutter.Actor & { set_tooltip_text: (text: string) => void }).set_tooltip_text(
+      tooltipText,
+    );
   }
 
   _displayStatus(text: string) {
@@ -251,7 +262,10 @@ class AccountCollection {
       }
     };
 
-    this._settingsChangedId = this.settings.connect('changed::' + ACCOUNTS_KEY, tryUpdateIndicators);
+    this._settingsChangedId = this.settings.connect(
+      'changed::' + ACCOUNTS_KEY,
+      tryUpdateIndicators,
+    );
 
     tryUpdateIndicators();
   }
@@ -290,23 +304,26 @@ class AccountCollection {
         const account = accounts[i];
         if (account) {
           const apiKey = await KeyringManager.retrieveApiKey(account.id);
-          const view = new RegisteredBalanceIndicatorView(this.ext, account.id, account, apiKey || '');
+          const view = new RegisteredBalanceIndicatorView(
+            this.ext,
+            account.id,
+            account,
+            apiKey || '',
+          );
           Main.panel.addToStatusArea(`balance-watch-${i}`, view);
           this._indicators.push(view);
         }
       }
     }
 
-    const subscribers = this._indicators
-      .filter(hasValidOptions)
-      .map((ind) => ({
-        accountId: ind.accountId,
-        options: ind.options!,
-        apiKey: ind._apiKey,
-        onUpdateStart: () => ind.onUpdateStart(),
-        onUpdateError: (err: Error) => ind.onUpdateError(err),
-        onUpdateBalance: (data: BalanceData) => ind.onUpdateBalance(data),
-      }));
+    const subscribers = this._indicators.filter(hasValidOptions).map((ind) => ({
+      accountId: ind.accountId,
+      options: ind.options!,
+      apiKey: ind._apiKey,
+      onUpdateStart: () => ind.onUpdateStart(),
+      onUpdateError: (err: Error) => ind.onUpdateError(err),
+      onUpdateBalance: (data: BalanceData) => ind.onUpdateBalance(data),
+    }));
 
     ApiService.setSubscribers(subscribers);
   }
@@ -328,6 +345,7 @@ export default class BalanceWatchExtension extends Extension {
 
   constructor(props: ExtensionMetadata) {
     super(props);
+    ApiService.setExtension(this);
   }
 
   enable(): void {

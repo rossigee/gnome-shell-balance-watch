@@ -68,10 +68,7 @@ function getExtensionVersion(metadata: ExtensionMetadata & Record<string, unknow
   }
 }
 
-export function getDefaultUserAgent(
-  metadata: ExtensionMetadata,
-  gnomeVersion: string,
-): string {
+export function getDefaultUserAgent(metadata: ExtensionMetadata, gnomeVersion: string): string {
   const repository = 'http://github.com/rossigee/gnome-shell-balance-watch';
   const version = getExtensionVersion(metadata as ExtensionMetadata & Record<string, unknown>);
   return `gnome-shell-balance-watch/${version}/Gnome${gnomeVersion} (${repository})`;

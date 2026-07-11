@@ -2,11 +2,7 @@ import StringFormat from 'string-format';
 import { CurrencySymbols } from '../defaults';
 import { BalanceData } from '../types';
 
-export function format(
-  data: BalanceData | undefined,
-  provider: string,
-  formatStr: string,
-): string {
+export function format(data: BalanceData | undefined, provider: string, formatStr: string): string {
   if (!data) {
     return provider + ' ...';
   }

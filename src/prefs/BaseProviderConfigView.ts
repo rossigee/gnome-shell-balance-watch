@@ -1,6 +1,5 @@
 import Gtk from '@girs/gtk-4.0';
 import { registerGObjectClass } from '../gjs';
-import { getAllProviders } from '../providers';
 
 export function makeConfigRow(labelText: string, widget: Gtk.Widget): Gtk.Grid {
   const grid = new Gtk.Grid({

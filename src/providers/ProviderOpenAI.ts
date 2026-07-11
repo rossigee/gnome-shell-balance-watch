@@ -26,7 +26,11 @@ export class Api extends BaseProvider.Api {
   }
 
   parseData(data: unknown): BalanceData {
-    const d = data as { total_usage?: number; has_more?: boolean; data?: Array<{ line_items?: Array<{ cost?: number }> }> };
+    const d = data as {
+      total_usage?: number;
+      has_more?: boolean;
+      data?: Array<{ line_items?: Array<{ cost?: number }> }>;
+    };
 
     let totalUsage = d.total_usage ?? 0;
 

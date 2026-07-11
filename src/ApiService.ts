@@ -4,9 +4,22 @@ import Gio from '@girs/gio-2.0';
 
 import * as HTTP from './HTTP';
 import { getProvider, BaseProvider, Providers, ProviderKey } from './providers';
-import { Extension } from '@gnome-shell/extensions/extension';
+import { Extension, ExtensionMetadata } from '@gnome-shell/extensions/extension';
 import { ERROR_MESSAGES, createContextualError, CircuitBreaker } from './ApiServiceUtils';
 import { AccountOptions, BalanceData } from './types';
+
+let _extension: Extension | null = null;
+
+export function setExtension(ext: Extension): void {
+  _extension = ext;
+}
+
+function getExtensionMetadata(): ExtensionMetadata {
+  if (!_extension) {
+    throw new Error('Extension not initialized');
+  }
+  return _extension.metadata;
+}
 
 export interface Subscriber {
   accountId: string;
@@ -164,7 +177,9 @@ class PollLoop {
       return;
     }
 
-    this.accountIds.forEach((accountId) => this.updateAccount(accountId, this.cache.get(accountId)));
+    this.accountIds.forEach((accountId) =>
+      this.updateAccount(accountId, this.cache.get(accountId)),
+    );
   }
 
   async updateAccount(accountId: string, cache?: CacheEntry) {
@@ -194,10 +209,7 @@ class PollLoop {
       return;
     }
 
-    const ext = Extension.lookupByURL(import.meta.url);
-    if (!ext) {
-      throw new Error('Unable to find extension');
-    }
+    const ext = getExtensionMetadata();
 
     const maxRetries = 3;
     const baseDelay = 1000;
@@ -213,14 +225,14 @@ class PollLoop {
 
         if (method === 'POST' && body) {
           response = await HTTP.postJSON(url, {
-            userAgent: HTTP.getDefaultUserAgent(ext.metadata, Config.PACKAGE_VERSION),
+            userAgent: HTTP.getDefaultUserAgent(ext, Config.PACKAGE_VERSION),
             headers,
             body,
             cancellable: this._cancellable,
           });
         } else {
           response = await HTTP.getJSON(url, {
-            userAgent: HTTP.getDefaultUserAgent(ext.metadata, Config.PACKAGE_VERSION),
+            userAgent: HTTP.getDefaultUserAgent(ext, Config.PACKAGE_VERSION),
             headers,
             cancellable: this._cancellable,
           });
@@ -255,7 +267,9 @@ class PollLoop {
 
         if (!isLastAttempt) {
           const delay = baseDelay * Math.pow(2, attempt);
-          console.log(`Request failed, retrying in ${delay}ms... (attempt ${attempt + 1}/${maxRetries})`);
+          console.log(
+            `Request failed, retrying in ${delay}ms... (attempt ${attempt + 1}/${maxRetries})`,
+          );
           await this.waitForRetry(delay);
           if (this._cancellable === null) {
             return;
@@ -293,7 +307,10 @@ class PollLoop {
 }
 
 const _pollLoops = new Map(
-  Object.entries(Providers).map(([key, provider]) => [key, new PollLoop(provider, key as ProviderKey)]),
+  Object.entries(Providers).map(([key, provider]) => [
+    key,
+    new PollLoop(provider, key as ProviderKey),
+  ]),
 );
 
 export function setSubscribers(subscribers: Subscriber[]) {

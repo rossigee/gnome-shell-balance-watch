@@ -9,7 +9,11 @@ const ACCOUNTS_KEY = 'accounts';
 export class ConfigModel {
   private attributes: Record<string, unknown>;
 
-  constructor(private listStore: Gtk.ListStore, private iter: Gtk.TreeIter, private column = 1) {
+  constructor(
+    private listStore: Gtk.ListStore,
+    private iter: Gtk.TreeIter,
+    private column = 1,
+  ) {
     this.attributes = JSON.parse(String(this.listStore.get_value(iter, this.column)));
   }
 
@@ -87,7 +91,7 @@ export class AccountCollectionModel extends Gtk.ListStore {
   }
 
   _writeSettings() {
-    let [res, iter] = this.get_iter_first();
+    const [res, iter] = this.get_iter_first();
     const configs: string[] = [];
 
     while (res) {
@@ -101,19 +105,19 @@ export class AccountCollectionModel extends Gtk.ListStore {
   _onRowChanged(self: AccountCollectionModel, path: Gtk.TreePath, iter: Gtk.TreeIter) {
     const config = String(this.get_value(iter, this.Columns.CONFIG));
 
-    this.set(iter, [this.Columns.LABEL, this.Columns.CONFIG], ([
+    this.set(iter, [this.Columns.LABEL, this.Columns.CONFIG], [
       this._getLabel(JSON.parse(config)),
       config,
-    ] as unknown) as GObject.Value[]);
+    ] as unknown as GObject.Value[]);
 
     this._writeSettings();
   }
 
   _onRowInserted(self: AccountCollectionModel, path: Gtk.TreePath, iter: Gtk.TreeIter) {
-    this.set(iter, [this.Columns.LABEL, this.Columns.CONFIG], ([
+    this.set(iter, [this.Columns.LABEL, this.Columns.CONFIG], [
       'New Account',
       JSON.stringify(Defaults),
-    ] as unknown) as GObject.Value[]);
+    ] as unknown as GObject.Value[]);
 
     this._writeSettings();
   }

@@ -1,12 +1,20 @@
 import Adw from '@girs/adw-1';
 import Gtk from '@girs/gtk-4.0';
+import Secret from '@girs/secret-1';
 import { ExtensionBase } from '@gnome-shell/extensions/extension';
 import { ExtensionPreferences } from '@gnome-shell/extensions/prefs';
 import { registerGObjectClass } from '../gjs';
 
 import { getAllProviders } from '../providers';
-import { BaseProviderConfigView, makeConfigRow, RegisteredComboBoxView as ComboBoxView } from './BaseProviderConfigView';
-import { ConfigModel, RegisteredAccountCollectionModel as AccountCollectionModel } from './AccountCollectionModel';
+import {
+  BaseProviderConfigView,
+  makeConfigRow,
+  RegisteredComboBoxView as ComboBoxView,
+} from './BaseProviderConfigView';
+import {
+  ConfigModel,
+  RegisteredAccountCollectionModel as AccountCollectionModel,
+} from './AccountCollectionModel';
 import { GettextFunc } from './gettext';
 
 type PreferencesGroupWithWidgetAdd = Adw.PreferencesGroup & {
@@ -34,7 +42,10 @@ class AccountConfigView {
   private _layoutSettings: Gtk.Box;
   private _apiConfigView?: BaseProviderConfigView;
 
-  constructor(private gettext: GettextFunc, accountConfig: ConfigModel) {
+  constructor(
+    private gettext: GettextFunc,
+    accountConfig: ConfigModel,
+  ) {
     this._accountConfig = accountConfig;
 
     this.widget = new Gtk.Box({
@@ -60,6 +71,7 @@ class AccountConfigView {
   _addSettings() {
     const layout = this._layoutSettings;
     layout.append(this._confProvider());
+    layout.append(this._confApiKey());
     layout.append(this._confLabel());
     layout.append(this._confInterval());
   }
@@ -71,7 +83,12 @@ class AccountConfigView {
     }
 
     try {
-      this._apiConfigView = new BaseProviderConfigView(this.gettext, provider, this._layoutSettings, this._accountConfig);
+      this._apiConfigView = new BaseProviderConfigView(
+        this.gettext,
+        provider,
+        this._layoutSettings,
+        this._accountConfig,
+      );
     } catch (e: any) {
       e.message = `Error creating configView for provider ${provider}: ${e.message}`;
       console.error(e);
@@ -108,6 +125,63 @@ class AccountConfigView {
     });
 
     return makeConfigRow(this.gettext('Provider'), view as unknown as Gtk.Widget);
+  }
+
+  _confApiKey(): Gtk.Widget {
+    const accountId = String(this._accountConfig.get('id') || 'unknown');
+    const vbox = new Gtk.Box({
+      orientation: Gtk.Orientation.VERTICAL,
+      spacing: 8,
+      valign: Gtk.Align.START,
+    });
+
+    const label = new Gtk.Label({
+      label: 'API Key',
+      halign: Gtk.Align.START,
+    });
+
+    const entry = new Gtk.Entry({
+      placeholder_text: 'Enter your API key...',
+      visibility: false,
+      width_chars: 40,
+    });
+
+    const buttonBox = new Gtk.Box({ spacing: 8 });
+    const saveButton = new Gtk.Button({ label: 'Save to Keyring' });
+    saveButton.get_style_context().add_class('suggested-action');
+
+    const statusLabel = new Gtk.Label({ label: '' });
+
+    saveButton.connect('clicked', async () => {
+      const apiKey = entry.get_text();
+      if (!apiKey.trim()) {
+        statusLabel.set_label('Error: API key is empty');
+        return;
+      }
+
+      try {
+        await Secret.password_store(
+          null,
+          { 'account-id': accountId },
+          Secret.COLLECTION_DEFAULT,
+          `Balance Watch - ${accountId}`,
+          apiKey,
+        );
+        statusLabel.set_label('Saved!');
+        setTimeout(() => statusLabel.set_label(''), 2000);
+      } catch (e) {
+        statusLabel.set_label('Error: ' + String(e));
+      }
+    });
+
+    buttonBox.append(saveButton);
+    buttonBox.append(statusLabel);
+
+    vbox.append(label);
+    vbox.append(entry);
+    vbox.append(buttonBox);
+
+    return vbox;
   }
 
   _confLabel(): Gtk.Widget {
