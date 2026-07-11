@@ -1,0 +1,46 @@
+{
+  "compilerOptions": {
+    "module": "ESNext",
+    "lib": ["ESNext"],
+    "target": "ESNext",
+    "strict": true,
+    "noImplicitAny": false,
+    "strictNullChecks": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "allowJs": true,
+    "baseUrl": "./src/",
+    "moduleResolution": "Node",
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "importHelpers": true,
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "paths": {
+      "@gnome-shell/misc/animationUtils": ["./types/misc/animationUtils/index.d.ts"],
+      "@gnome-shell/misc/config": ["./types/misc/config/index.d.ts"],
+      "@gnome-shell/misc/signals": ["./types/misc/signals/index.d.ts"],
+      "@gnome-shell/misc/util": ["./types/misc/util/index.d.ts"],
+      "@gnome-shell/extensions/extension": ["./types/extension/extension.d.ts"],
+      "@gnome-shell/extensions/prefs": ["./types/extension/prefs.d.ts"],
+      "@gnome-shell/ui/layout": ["./types/ui/layout/index.d.ts"],
+      "@gnome-shell/ui/main": ["./types/ui/main/index.d.ts"],
+      "@gnome-shell/ui/messageTray": ["./types/ui/messageTray/index.d.ts"],
+      "@gnome-shell/ui/lightbox": ["./types/ui/lightbox/index.d.ts"],
+      "@gnome-shell/ui/dialog": ["./types/ui/dialog/index.d.ts"],
+      "@gnome-shell/ui/modalDialog": ["./types/ui/modalDialog/index.d.ts"],
+      "@gnome-shell/ui/popupMenu": ["./types/ui/popupMenu/index.d.ts"],
+      "@gnome-shell/ui/panelMenu": ["./types/ui/panelMenu/index.d.ts"]
+    }
+  },
+  "include": [
+    "./src/**/*",
+    "./node_modules/@girs/*-13/**/*",
+    "./node_modules/@girs/*-15/**/*",
+    "./node_modules/@girs/gio-2.0/**/*",
+    "./node_modules/@girs/glib-2.0/**/*",
+    "./node_modules/@girs/gobject-2.0/**/*"
+  ],
+  "exclude": ["node_modules/**/*", "node_modules/@girs/gnome-shell/**/*"]
+}

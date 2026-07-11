@@ -1,0 +1,6 @@
+dist/
+build/
+*.zip
+*.log
+node_modules/
+.eslintcache

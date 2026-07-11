@@ -1,0 +1,10 @@
+{
+  "shell-version": ["46", "47", "48", "49", "50"],
+  "uuid": "balance-watch@rossigee.dev",
+  "name": "Balance Watch",
+  "url": "https://github.com/rossigee/gnome-shell-balance-watch/",
+  "description": "Monitor AI service account balances in the GNOME Shell panel.",
+  "settings-schema": "org.gnome.shell.extensions.balance-watch",
+  "gettext-domain": "gnome-shell-balance-watch",
+  "git-version": "_gitversion_"
+}
