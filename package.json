@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "Gnome-Shell Extension to monitor AI service account balances",
   "scripts": {
-    "test": "TS_NODE_PROJECT=./tsconfig.test.json mocha --require ts-node/register test/**/*.ts",
-    "coverage": "tsx ./node_modules/.bin/mocha test/**/*.ts"
+    "test": "tsx scripts/test.mjs",
+    "coverage": "tsx scripts/test.mjs"
   },
   "repository": {
     "type": "git",
@@ -52,7 +52,7 @@
     "rollup-plugin-scss": "^4.0.0",
     "rollup-plugin-typescript2": "^0.36.0",
     "tslib": "^2.6.2",
-    "tsx": "^4.21.0",
+    "tsx": "^4.23.0",
     "typescript": "^5.3.2"
   },
   "dependencies": {

@@ -1,4 +1,3 @@
-import StringFormat from 'string-format';
 import { CurrencySymbols } from '../defaults';
 import { BalanceData } from '../types';
 
@@ -10,15 +9,15 @@ export function format(data: BalanceData | undefined, provider: string, formatSt
   const value = data.available;
   const currencySymbol = CurrencySymbols[data.currency] || data.currency;
 
-  const formatData = {
-    provider: provider,
+  const formatData: Record<string, unknown> = {
+    provider,
     v: formatValue(value),
     raw: value,
     cs: currencySymbol,
     currency: data.currency,
   };
 
-  return StringFormat.create({})(formatStr, formatData);
+  return formatStr.replace(/\{(\w+)\}/g, (_, key) => String(formatData[key] ?? ''));
 }
 
 function formatValue(value: number): string {
