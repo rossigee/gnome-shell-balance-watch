@@ -4,7 +4,8 @@
   "description": "Gnome-Shell Extension to monitor AI service account balances",
   "scripts": {
     "test": "tsx scripts/test.mjs",
-    "coverage": "tsx scripts/test.mjs"
+    "coverage": "tsx scripts/test.mjs",
+    "check-balances": "tsx scripts/check-balances.mts"
   },
   "repository": {
     "type": "git",

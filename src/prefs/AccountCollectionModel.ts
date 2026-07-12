@@ -1,6 +1,6 @@
-import Gtk from '@girs/gtk-4.0';
-import GObject from '@girs/gobject-2.0';
-import Gio from '@girs/gio-2.0';
+import Gtk from 'gi://Gtk';
+import GObject from 'gi://GObject';
+import Gio from 'gi://Gio';
 import { registerGObjectClass } from '../gjs';
 import { Defaults } from '../defaults';
 
@@ -91,7 +91,8 @@ export class AccountCollectionModel extends Gtk.ListStore {
   }
 
   _writeSettings() {
-    const [res, iter] = this.get_iter_first();
+    const [firstRes, iter] = this.get_iter_first();
+    let res: boolean = firstRes;
     const configs: string[] = [];
 
     while (res) {

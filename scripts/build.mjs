@@ -10,22 +10,22 @@ const __dirname = dirname(__filename);
 const rootDir = join(__dirname, '..');
 
 const external = [
-  '@girs/gio-2.0',
-  '@girs/glib-2.0',
-  '@girs/gobject-2.0',
-  '@girs/gtk-4.0',
-  '@girs/adw-1',
-  '@girs/st-13',
-  '@girs/clutter-13',
-  '@girs/shell-15',
-  '@girs/soup-3.0',
-  '@girs/secret-1',
-  '@gnome-shell/extensions/extension',
-  '@gnome-shell/extensions/prefs',
-  '@gnome-shell/ui/main',
-  '@gnome-shell/ui/panelMenu',
-  '@gnome-shell/ui/popupMenu',
-  '@gnome-shell/misc/config',
+  'gi://Gio',
+  'gi://GLib',
+  'gi://GObject',
+  'gi://Gtk',
+  'gi://Adw',
+  'gi://St',
+  'gi://Clutter',
+  'gi://GnomeShell',
+  'gi://Soup',
+  'gi://Secret',
+  'resource:///org/gnome/shell/extensions/extension.js',
+  'resource:///org/gnome/shell/extensions/prefs.js',
+  'resource:///org/gnome/shell/ui/main.js',
+  'resource:///org/gnome/shell/ui/panelMenu.js',
+  'resource:///org/gnome/shell/ui/popupMenu.js',
+  'resource:///org/gnome/shell/misc/config.js',
 ];
 
 console.log('Building extension...');
@@ -39,14 +39,23 @@ await esbuild.build({
   entryPoints: [join(rootDir, 'src/extension.ts')],
   bundle: true,
   outfile: join(distDir, 'extension.js'),
-  format: 'iife',
-  platform: 'browser',
+  format: 'esm',
+  platform: 'neutral',
   target: 'es2020',
   sourcemap: true,
   external: external,
   loader: { '.ts': 'ts' },
   tsconfig: join(rootDir, 'tsconfig.json'),
   logLevel: 'info',
+  plugins: [{
+    name: 'external-modules',
+    setup(build) {
+      build.onResolve({ filter: /^resource:\/\// }, args => ({
+        path: args.path,
+        external: true,
+      }));
+    },
+  }],
 });
 
 console.log('Copying resources...');

@@ -27,7 +27,9 @@ npm test          # Run tests
 
 ### Debugging
 ```bash
-journalctl /usr/bin/gnome-shell -f  # Monitor extension logs
+journalctl /usr/bin/gnome-shell -f            # Monitor extension logs
+npm run check-balances                        # Check all configured accounts (requires make install)
+npm run check-balances -- --provider openai --key sk-...  # Test a specific provider/key
 ```
 
 ## Architecture

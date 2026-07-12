@@ -1,7 +1,7 @@
-import Soup from '@girs/soup-3.0';
-import Gio from '@girs/gio-2.0';
-import GLib from '@girs/glib-2.0';
-import { ExtensionMetadata } from '@gnome-shell/extensions/extension';
+import Soup from 'gi://Soup';
+import Gio from 'gi://Gio';
+import GLib from 'gi://GLib';
+import { ExtensionMetadata } from 'resource:///org/gnome/shell/extensions/extension.js';
 
 const { Bytes } = GLib;
 

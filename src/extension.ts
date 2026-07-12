@@ -1,12 +1,12 @@
-import Gio from '@girs/gio-2.0';
-import St from '@girs/st-13';
-import Clutter from '@girs/clutter-13';
-import { Extension, ExtensionBase, ExtensionMetadata } from '@gnome-shell/extensions/extension';
+import type Gio from 'gi://Gio';
+import type Clutter from 'gi://Clutter';
+import { Extension, ExtensionBase, ExtensionMetadata } from 'resource:///org/gnome/shell/extensions/extension.js';
+import St from 'gi://St';
 import { registerGObjectClass } from './gjs';
 
-import * as Main from '@gnome-shell/ui/main';
-import * as PanelMenu from '@gnome-shell/ui/panelMenu';
-import * as PopupMenu from '@gnome-shell/ui/popupMenu';
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
+import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 
 import * as ApiService from './ApiService';
 import * as Format from './format/Format';
@@ -23,6 +23,14 @@ const _Symbols = {
   error: '\u26A0',
   refresh: '\u27f3',
 };
+
+function escapeMarkup(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
 
 interface AccountConfig extends AccountOptions {
   id: string;
@@ -57,6 +65,7 @@ class BalanceIndicatorView extends PanelMenu.Button {
   _popupItemSettings!: PopupMenu.PopupMenuItem;
   _currentError?: Error | null;
   _apiKey: string = '';
+  _balanceLevel: 'normal' | 'warning' | 'critical' = 'normal';
 
   actor!: Clutter.Actor;
 
@@ -96,6 +105,7 @@ class BalanceIndicatorView extends PanelMenu.Button {
 
   _clearError() {
     this._currentError = null;
+    this._resetBalanceStyling();
     this._displayStatus(_Symbols.refresh);
     this._setTooltip(null);
     this._updatePopupItemLabel();
@@ -195,14 +205,62 @@ class BalanceIndicatorView extends PanelMenu.Button {
     const displayFormat = this.options?.format || '{provider} {v} {cs}';
     this._displayText(Format.format(data, this.providerLabel, displayFormat));
     this._displayStatus('');
+    this._setBalanceLevel(data.available);
     this._updatePopupItemLabel();
     this._setTooltip(null);
   }
 
+  private _setBalanceLevel(available: number) {
+    const critical = this.options?.criticalThreshold ?? 1;
+    const warning = this.options?.warningThreshold ?? 2;
+
+    let newLevel: 'normal' | 'warning' | 'critical' = 'normal';
+    if (available < critical) {
+      newLevel = 'critical';
+    } else if (available < warning) {
+      newLevel = 'warning';
+    }
+
+    if (newLevel !== this._balanceLevel) {
+      this._indicatorView.remove_style_class_name('balance-warning');
+      this._indicatorView.remove_style_class_name('balance-critical');
+      this._statusView.remove_style_class_name('balance-warning-status');
+      this._statusView.remove_style_class_name('balance-critical-status');
+
+      if (newLevel === 'warning') {
+        this._indicatorView.add_style_class_name('balance-warning');
+        this._statusView.add_style_class_name('balance-warning-status');
+        this._displayStatus('\u26A0');
+      } else if (newLevel === 'critical') {
+        this._indicatorView.add_style_class_name('balance-critical');
+        this._statusView.add_style_class_name('balance-critical-status');
+        this._displayStatus('\u26A0');
+      } else {
+        this._displayStatus('');
+      }
+
+      this._balanceLevel = newLevel;
+    }
+  }
+
   private _showLoading() {
+    this._resetBalanceStyling();
     this._displayStatus(_Symbols.refresh);
     this._setTooltip(null);
     this._updatePopupItemLabel();
+  }
+
+  private _resetBalanceStyling() {
+    this._balanceLevel = 'normal';
+    this._indicatorView.remove_style_class_name('balance-warning');
+    this._indicatorView.remove_style_class_name('balance-critical');
+    this._statusView.remove_style_class_name('balance-warning-status');
+    this._statusView.remove_style_class_name('balance-critical-status');
+    const label = (this._popupItemStatus as unknown as { label: St.Label }).label;
+    if (label) {
+      label.remove_style_class_name('menu-item-warning');
+      label.remove_style_class_name('menu-item-critical');
+    }
   }
 
   private _setTooltip(error?: Error | null) {
@@ -224,10 +282,21 @@ class BalanceIndicatorView extends PanelMenu.Button {
   }
 
   _updatePopupItemLabel(err?: Error) {
-    let text = this.providerLabel;
+    const label = (this._popupItemStatus as unknown as { label: St.Label }).label;
+    if (label) {
+      label.remove_style_class_name('menu-item-warning');
+      label.remove_style_class_name('menu-item-critical');
+      if (this._balanceLevel === 'warning') {
+        label.add_style_class_name('menu-item-warning');
+      } else if (this._balanceLevel === 'critical') {
+        label.add_style_class_name('menu-item-critical');
+      }
+    }
+
+    let text = escapeMarkup(this.providerLabel);
     if (err) {
       const errorMsg = err instanceof HTTP.HTTPError ? err.format('\n\n') : String(err);
-      text += '\n\n<b>\u26A0 Error:</b>\n' + errorMsg;
+      text += '\n\n<b>\u26A0 Error:</b>\n' + escapeMarkup(errorMsg);
     }
     this._popupItemStatus.label.clutter_text.set_markup(text);
   }
@@ -349,10 +418,12 @@ export default class BalanceWatchExtension extends Extension {
   }
 
   enable(): void {
+    console.log('balance-watch: enable() called');
     try {
       this._accountCollection = new AccountCollection(this);
+      console.log('balance-watch: AccountCollection created');
     } catch (e) {
-      console.error(e);
+      console.error('balance-watch: Error in enable():', e);
     }
   }
 

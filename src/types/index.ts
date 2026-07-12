@@ -10,6 +10,8 @@ export interface AccountOptions {
   label?: string;
   interval?: number;
   format?: string;
+  warningThreshold?: number;
+  criticalThreshold?: number;
   extraParams?: Record<string, string>;
 }
 

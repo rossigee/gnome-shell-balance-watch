@@ -1,4 +1,4 @@
-import Adw from '@girs/adw-1';
+import Adw from 'gi://Adw';
 import GnomeShell from '@girs/gnome-shell';
 
 import { ExtensionBase } from './extension';

@@ -3,7 +3,33 @@
   color: #ffffff;
 }
 
+.balance-warning {
+  color: #f5a623;
+}
+
+.balance-critical {
+  color: #d50200;
+}
+
 .status {
   font-size: 10px;
   margin-right: 4px;
+}
+
+.balance-warning-status {
+  color: #f5a623;
+}
+
+.balance-critical-status {
+  color: #d50200;
+}
+
+.menu-item-warning {
+  color: #f5a623;
+  font-weight: bold;
+}
+
+.menu-item-critical {
+  color: #d50200;
+  font-weight: bold;
 }

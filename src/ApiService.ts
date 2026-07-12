@@ -1,10 +1,9 @@
 import { idleAdd, timeoutAdd, timeoutRemove } from './timeouts';
-import * as Config from '@gnome-shell/misc/config';
-import Gio from '@girs/gio-2.0';
+import Gio from 'gi://Gio';
 
 import * as HTTP from './HTTP';
 import { getProvider, BaseProvider, Providers, ProviderKey } from './providers';
-import { Extension, ExtensionMetadata } from '@gnome-shell/extensions/extension';
+import { Extension, ExtensionMetadata } from 'resource:///org/gnome/shell/extensions/extension.js';
 import { ERROR_MESSAGES, createContextualError, CircuitBreaker } from './ApiServiceUtils';
 import { AccountOptions, BalanceData } from './types';
 
@@ -225,14 +224,14 @@ class PollLoop {
 
         if (method === 'POST' && body) {
           response = await HTTP.postJSON(url, {
-            userAgent: HTTP.getDefaultUserAgent(ext, Config.PACKAGE_VERSION),
+            userAgent: HTTP.getDefaultUserAgent(ext, 'unknown'),
             headers,
             body,
             cancellable: this._cancellable,
           });
         } else {
           response = await HTTP.getJSON(url, {
-            userAgent: HTTP.getDefaultUserAgent(ext, Config.PACKAGE_VERSION),
+            userAgent: HTTP.getDefaultUserAgent(ext, 'unknown'),
             headers,
             cancellable: this._cancellable,
           });

@@ -1,4 +1,4 @@
-import Gio from '@girs/gio-2.0';
+import Gio from 'gi://Gio';
 import GnomeShell from '@girs/gnome-shell';
 export type ExtensionType = typeof GnomeShell.misc.extensionUtils.ExtensionType;
 
