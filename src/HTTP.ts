@@ -1,7 +1,9 @@
 import Soup from 'gi://Soup';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import { ExtensionMetadata } from 'resource:///org/gnome/shell/extensions/extension.js';
+import type { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
+
+type ExtensionMetadata = Extension['metadata'];
 
 const { Bytes } = GLib;
 

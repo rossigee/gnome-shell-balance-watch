@@ -1,10 +1,8 @@
 import Adw from 'gi://Adw';
 import Gtk from 'gi://Gtk';
 import Secret from 'gi://Secret';
-import {
-  ExtensionPreferences,
-  ExtensionBase,
-} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
+import { ExtensionPreferences } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
+import type { ExtensionBase } from '@girs/gnome-shell/extensions/sharedInternals';
 import { registerGObjectClass } from '../gjs';
 
 import { getAllProviders } from '../providers';
@@ -417,7 +415,9 @@ class BalanceWatchSettingsWidget extends Gtk.Box {
 const RegisteredBalanceWatchSettingsWidget = registerGObjectClass(BalanceWatchSettingsWidget);
 
 export default class BalanceWatchSettings extends ExtensionPreferences {
-  fillPreferencesWindow(window: Adw.PreferencesWindow): void {
+  async fillPreferencesWindow(
+    window: Parameters<ExtensionPreferences['fillPreferencesWindow']>[0],
+  ): Promise<void> {
     const page = new Adw.PreferencesPage();
     const gtkWidget = new RegisteredBalanceWatchSettingsWidget(this);
 

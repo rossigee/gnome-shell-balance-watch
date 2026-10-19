@@ -3,7 +3,7 @@ import Gio from 'gi://Gio';
 
 import * as HTTP from './HTTP';
 import { getProvider, BaseProvider, Providers, ProviderKey } from './providers';
-import { Extension, ExtensionMetadata } from 'resource:///org/gnome/shell/extensions/extension.js';
+import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
 import { ERROR_MESSAGES, createContextualError, CircuitBreaker } from './ApiServiceUtils';
 import { AccountOptions, BalanceData } from './types';
 
@@ -13,7 +13,7 @@ export function setExtension(ext: Extension): void {
   _extension = ext;
 }
 
-function getExtensionMetadata(): ExtensionMetadata {
+function getExtensionMetadata(): Extension['metadata'] {
   if (!_extension) {
     throw new Error('Extension not initialized');
   }

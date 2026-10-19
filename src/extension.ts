@@ -1,10 +1,8 @@
 import type Gio from 'gi://Gio';
-import type Clutter from 'gi://Clutter';
-import {
-  Extension,
-  ExtensionBase,
-  ExtensionMetadata,
-} from 'resource:///org/gnome/shell/extensions/extension.js';
+import Clutter from 'gi://Clutter';
+import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
+import type { ExtensionBase } from '@girs/gnome-shell/extensions/sharedInternals';
+import type { ExtensionMetadata } from '@girs/gnome-shell/types/extension-metadata';
 import St from 'gi://St';
 import { registerGObjectClass } from './gjs';
 
