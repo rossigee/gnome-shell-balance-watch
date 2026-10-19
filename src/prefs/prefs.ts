@@ -1,7 +1,10 @@
 import Adw from 'gi://Adw';
 import Gtk from 'gi://Gtk';
 import Secret from 'gi://Secret';
-import { ExtensionPreferences, ExtensionBase } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
+import {
+  ExtensionPreferences,
+  ExtensionBase,
+} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 import { registerGObjectClass } from '../gjs';
 
 import { getAllProviders } from '../providers';
