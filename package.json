@@ -4,7 +4,8 @@
   "description": "Gnome-Shell Extension to monitor AI service account balances",
   "scripts": {
     "test": "tsx scripts/test.mjs",
-    "coverage": "tsx scripts/test.mjs"
+    "coverage": "tsx scripts/test.mjs",
+    "check-balances": "tsx scripts/check-balances.mts"
   },
   "repository": {
     "type": "git",
@@ -61,5 +62,9 @@
     "gettext-extractor": "^3.5.3",
     "string-format": "^2.0.0",
     "ts-node": "^10.9.1"
+  },
+  "overrides": {
+    "@girs/adw-1": "$@girs/adw-1",
+    "@girs/gtk-4.0": "$@girs/gtk-4.0"
   }
 }

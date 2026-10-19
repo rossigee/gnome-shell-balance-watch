@@ -1,4 +1,4 @@
-import Secret from '@girs/secret-1';
+import Secret from 'gi://Secret';
 
 const ATTRIBUTE_ACCOUNT_ID = 'account-id';
 

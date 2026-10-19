@@ -1,8 +1,8 @@
-import Adw from '@girs/adw-1';
-import Gtk from '@girs/gtk-4.0';
-import Secret from '@girs/secret-1';
-import { ExtensionBase } from '@gnome-shell/extensions/extension';
-import { ExtensionPreferences } from '@gnome-shell/extensions/prefs';
+import Adw from 'gi://Adw';
+import Gtk from 'gi://Gtk';
+import Secret from 'gi://Secret';
+import { ExtensionPreferences } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
+import type { ExtensionBase } from '@girs/gnome-shell/extensions/sharedInternals';
 import { registerGObjectClass } from '../gjs';
 
 import { getAllProviders } from '../providers';
@@ -74,6 +74,7 @@ class AccountConfigView {
     layout.append(this._confApiKey());
     layout.append(this._confLabel());
     layout.append(this._confInterval());
+    layout.append(this._confThresholds());
   }
 
   _selectProvider(provider: string) {
@@ -217,6 +218,56 @@ class AccountConfigView {
     box.append(new Gtk.Label({ label: 'seconds' }));
 
     return makeConfigRow(this.gettext('Update Interval'), box);
+  }
+
+  _confThresholds(): Gtk.Widget {
+    const vbox = new Gtk.Box({
+      orientation: Gtk.Orientation.VERTICAL,
+      spacing: 6,
+      valign: Gtk.Align.START,
+    });
+
+    const headerLabel = new Gtk.Label({
+      label: 'Balance Thresholds',
+      halign: Gtk.Align.START,
+    });
+
+    const warningPreset = parseFloat(String(this._accountConfig.get('warningThreshold') || '2'));
+    const criticalPreset = parseFloat(String(this._accountConfig.get('criticalThreshold') || '1'));
+
+    const warningRow = new Gtk.Box({ spacing: 6 });
+    warningRow.append(new Gtk.Label({ label: 'Warning below:', halign: Gtk.Align.START }));
+
+    const warningAdj = Gtk.Adjustment.new(warningPreset, 0, 99999, 0.01, 1, 0);
+    const warningSpin = new Gtk.SpinButton({
+      adjustment: warningAdj,
+      numeric: true,
+      digits: 2,
+    });
+    warningSpin.connect('value-changed', () => {
+      this._accountConfig.set('warningThreshold', warningSpin.get_value());
+    });
+    warningRow.append(warningSpin);
+
+    const criticalRow = new Gtk.Box({ spacing: 6 });
+    criticalRow.append(new Gtk.Label({ label: 'Critical below:', halign: Gtk.Align.START }));
+
+    const criticalAdj = Gtk.Adjustment.new(criticalPreset, 0, 99999, 0.01, 1, 0);
+    const criticalSpin = new Gtk.SpinButton({
+      adjustment: criticalAdj,
+      numeric: true,
+      digits: 2,
+    });
+    criticalSpin.connect('value-changed', () => {
+      this._accountConfig.set('criticalThreshold', criticalSpin.get_value());
+    });
+    criticalRow.append(criticalSpin);
+
+    vbox.append(headerLabel);
+    vbox.append(warningRow);
+    vbox.append(criticalRow);
+
+    return vbox;
   }
 }
 
@@ -364,7 +415,9 @@ class BalanceWatchSettingsWidget extends Gtk.Box {
 const RegisteredBalanceWatchSettingsWidget = registerGObjectClass(BalanceWatchSettingsWidget);
 
 export default class BalanceWatchSettings extends ExtensionPreferences {
-  fillPreferencesWindow(window: Adw.PreferencesWindow): void {
+  async fillPreferencesWindow(
+    window: Parameters<ExtensionPreferences['fillPreferencesWindow']>[0],
+  ): Promise<void> {
     const page = new Adw.PreferencesPage();
     const gtkWidget = new RegisteredBalanceWatchSettingsWidget(this);
 

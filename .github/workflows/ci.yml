@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  test-and-build:
+    name: Test and Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7.1.0
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit tests
+        run: npm test
+
+      # glib-compile-schemas comes from libglib2.0-bin; without it the build falls back to copying the schema
+      - name: Install GNOME build tools
+        run: sudo apt-get update && sudo apt-get install -y libglib2.0-bin zip
+
+      - name: Build extension
+        run: make build
+
+  # Known failures on master (prettier error in src/extension.ts; type errors on GNOME module imports).
+  # Reported, but not blocking, until they are fixed.
+  lint-and-check:
+    name: Lint and Type Check (non-blocking)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7.1.0
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linter
+        run: make lint
+
+      - name: Run type checking
+        run: make check

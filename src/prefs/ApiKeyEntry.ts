@@ -1,5 +1,5 @@
-import Gtk from '@girs/gtk-4.0';
-import Secret from '@girs/secret-1';
+import Gtk from 'gi://Gtk';
+import Secret from 'gi://Secret';
 import { makeConfigRow } from './BaseProviderConfigView';
 
 export class ApiKeyEntry extends Gtk.Box {

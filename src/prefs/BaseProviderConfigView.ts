@@ -1,4 +1,4 @@
-import Gtk from '@girs/gtk-4.0';
+import Gtk from 'gi://Gtk';
 import { registerGObjectClass } from '../gjs';
 
 export function makeConfigRow(labelText: string, widget: Gtk.Widget): Gtk.Grid {
