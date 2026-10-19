@@ -20,8 +20,7 @@ const external = [
   'gi://GnomeShell',
   'gi://Soup',
   'gi://Secret',
-  'resource:///org/gnome/shell/extensions/extension.js',
-  'resource:///org/gnome/shell/extensions/prefs.js',
+  'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js',
   'resource:///org/gnome/shell/ui/main.js',
   'resource:///org/gnome/shell/ui/panelMenu.js',
   'resource:///org/gnome/shell/ui/popupMenu.js',
@@ -39,6 +38,31 @@ await esbuild.build({
   entryPoints: [join(rootDir, 'src/extension.ts')],
   bundle: true,
   outfile: join(distDir, 'extension.js'),
+  format: 'esm',
+  platform: 'neutral',
+  target: 'es2020',
+  sourcemap: true,
+  external: external,
+  loader: { '.ts': 'ts' },
+  tsconfig: join(rootDir, 'tsconfig.json'),
+  logLevel: 'info',
+  plugins: [{
+    name: 'external-modules',
+    setup(build) {
+      build.onResolve({ filter: /^resource:\/\// }, args => ({
+        path: args.path,
+        external: true,
+      }));
+    },
+  }],
+});
+
+console.log('Building preferences...');
+
+await esbuild.build({
+  entryPoints: [join(rootDir, 'src/prefs/prefs.ts')],
+  bundle: true,
+  outfile: join(distDir, 'prefs.js'),
   format: 'esm',
   platform: 'neutral',
   target: 'es2020',
