@@ -34,14 +34,15 @@ dist/.built: src/extension.ts
 	@touch $@
 
 res/metadata.json: FORCE
-	@cp src/metadata.json $@ 2>/dev/null || true
+	@cp src/metadata.json $@
 
 .PHONY: schemas
 schemas: build/schemas/gschemas.compiled
 
 build/schemas/gschemas.compiled: res/schemas/$(SCHEMA)
 	mkdir -p build/schemas
-	glib-compile-schemas res/schemas/ 2>/dev/null || cp $< build/schemas/
+	cp $< build/schemas/
+	glib-compile-schemas build/schemas/
 
 .PHONY: lint
 lint:
