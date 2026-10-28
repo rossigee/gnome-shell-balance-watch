@@ -326,11 +326,9 @@ class AccountCollection {
     }
 
     const tryUpdateIndicators = () => {
-      try {
-        this._updateIndicators();
-      } catch (e) {
-        console.error(e);
-      }
+      this._updateIndicators().catch((e: unknown) => {
+        console.error('Error updating indicators:', e);
+      });
     };
 
     this._settingsChangedId = this.settings.connect(
@@ -423,7 +421,6 @@ export default class BalanceWatchExtension extends Extension {
     console.log('balance-watch: enable() called');
     try {
       this._accountCollection = new AccountCollection(this);
-      console.log('balance-watch: AccountCollection created');
     } catch (e) {
       console.error('balance-watch: Error in enable():', e);
     }
